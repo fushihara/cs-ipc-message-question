@@ -49,7 +49,7 @@ namespace ShComp.Ipc {
                     // メッセージの送受信は MessageHolder を介しておこなわれます。
                     // MessageHolder の MessageReceived イベントをキャッチして、
                     // このクラスに設定された MessageReceived イベントを発生させます。
-                    _messageHolder.MessageReceived += new Action<T>(MessageHolder_MessageReceived);
+                    _messageHolder.MessageReceived += new Func<T, String>(MessageHolder_MessageReceived);
                     Console.WriteLine($"messageHolder.hash={_messageHolder.GetHashCode()}");
                 } catch (RemotingException) {
                     // クライアント作成
@@ -106,18 +106,19 @@ namespace ShComp.Ipc {
         /// <summary>
         /// MessageReceived イベントを発生させます。
         /// </summary>
-        private void MessageHolder_MessageReceived(T message) {
+        private String MessageHolder_MessageReceived(T message) {
             Message = message;
             if (_messageReceived != null)
-                _messageReceived(this, new MessageEventArgs<T>(message));
+                return _messageReceived(this, new MessageEventArgs<T>(message));
+            return "";
         }
 
         /// <summary>
         /// メッセージを送信します。
         /// </summary>
         /// <param name="message">送信するメッセージ</param>
-        public void SendMessage(T message) {
-            _messageHolder.OnMessageReceived(message);
+        public String SendMessage(T message) {
+            return _messageHolder.OnMessageReceived(message);
         }
 
         /// <summary>
@@ -155,14 +156,17 @@ namespace ShComp.Ipc {
             /// <summary>
             /// メッセージを受信したときに発生します。
             /// </summary>
-            public event Action<T> MessageReceived;
+            public event Func<T, String> MessageReceived;
 
             /// <summary>
             /// MessageEventHandler イベントを発生させます。
             /// </summary>
-            public void OnMessageReceived(T message) {
-                if (MessageReceived != null)
-                    MessageReceived(message);
+            public String OnMessageReceived(T message) {
+                if (MessageReceived != null) {
+                    return MessageReceived(message);
+                }
+                return "";
+
             }
         }
     }
@@ -170,7 +174,7 @@ namespace ShComp.Ipc {
     /// <summary>
     /// IPC通信で発生するメッセージの受け渡しに関するイベントを処理するメソッドを表します。
     /// </summary>
-    public delegate void MessageEventHandler<T>(object sender, MessageEventArgs<T> e);
+    public delegate String MessageEventHandler<T>(object sender, MessageEventArgs<T> e);
 
     /// <summary>
     /// IPC通信で発生するメッセージの受け渡しに関するイベントのデータを提供します。

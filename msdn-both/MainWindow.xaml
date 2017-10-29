@@ -7,11 +7,6 @@
         mc:Ignorable="d" Loaded="Window_Loaded"
         Title="MSDN 両対応" Height="350" Width="525">
     <DockPanel>
-        <DockPanel DockPanel.Dock="Top">
-            <Button DockPanel.Dock="Right" Click="sendButtonCliek">送信</Button>
-            <Button DockPanel.Dock="Right" Click="logClearButtonCliek">ログのクリア</Button>
-            <TextBox x:Name="sendText">こちらサーバー</TextBox>
-        </DockPanel>
         <TextBox IsReadOnly="True" x:Name="logText" VerticalScrollBarVisibility="Visible">
         </TextBox>
     </DockPanel>
